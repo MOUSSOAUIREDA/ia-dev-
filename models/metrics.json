@@ -1,10 +1,14 @@
 {
   "source": "allocine+produits",
-  "date": "2026-10-21",
-  "n_train": 15977,
-  "n_test": 3995,
-  "f1_macro": 0.9089,
-  "accuracy": 0.9089,
-  "recall_negative": 0.899,
+  "date": "2026-10-22",
+  "n_total": 19994,
+  "n_train": 15995,
+  "n_test": 3999,
+  "n_produits_train": 35,
+  "poids_allocine": 1.0,
+  "poids_produits": 40.0,
+  "f1_macro": 0.9037,
+  "accuracy": 0.9037,
+  "recall_negative": 0.8883,
   "seuil_f1": 0.85
 }
