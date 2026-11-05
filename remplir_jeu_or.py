@@ -1,6 +1,6 @@
 
-from pathlib import Path
 import csv
+from pathlib import Path
 
 fichier = Path("data/jeu_or.csv")
 fichier.parent.mkdir(parents=True, exist_ok=True)

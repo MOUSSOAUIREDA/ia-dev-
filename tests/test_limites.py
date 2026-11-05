@@ -1,53 +1,111 @@
-"""Tests aux limites du contrat d'entrée (TP4, étape B). À COMPLÉTER.
 
-PredictRequest promet un champ « text », chaîne de 1 à 2000 caractères.
-Ce fichier vérifie cette promesse à ses frontières, puis au hasard (hypothesis).
-"""
+"""Tests aux limites du contrat d'entrée (TP4, étape B)."""
+
 import json
 from pathlib import Path
 
 import pytest
+from hypothesis import given, settings
+from hypothesis import strategies as st
 
 MODELE = Path(__file__).resolve().parents[1] / "models" / "sentiment.joblib"
-pytestmark = pytest.mark.skipif(not MODELE.exists(), reason="modèle non produit : python src/train.py")
+
+pytestmark = pytest.mark.skipif(
+    not MODELE.exists(),
+    reason="modèle non produit : python src/train.py",
+)
 
 
 @pytest.fixture(scope="module")
 def client():
-    """Portée « module » : l'API démarre une fois pour tout le fichier (hypothesis l'exige)."""
     from fastapi.testclient import TestClient
 
     from api.main import app
 
-    with TestClient(app) as c:  # le « with » exécute le lifespan : le modèle est chargé
+    with TestClient(app) as c:
         yield c
 
 
-def en_json(valeur: object) -> bytes:
-    """Corps de requête JSON, sous forme d'octets : permet aussi d'envoyer un corps invalide."""
+def en_json(valeur):
     return json.dumps(valeur).encode("utf-8")
 
 
-# Étape B.1 : huit cas au moins, chacun avec son code attendu. Deux sont donnés.
-# À ajouter : texte fait d'espaces, un seul caractère, exactement 2000 caractères,
-# champ absent, champ d'un autre type (42), corps qui n'est pas du JSON (b"pas du json").
+# B.1 : huit cas de validation
 CAS = [
     pytest.param(en_json({"text": ""}), 422, id="texte-vide"),
     pytest.param(en_json({"text": "a" * 2001}), 422, id="2001-caracteres"),
+    pytest.param(en_json({"text": "   "}), 422, id="texte-espaces"),
+    pytest.param(en_json({"text": "a"}), 200, id="un-caractere"),
+    pytest.param(en_json({"text": "a" * 2000}), 200, id="2000-caracteres"),
+    pytest.param(en_json({}), 422, id="champ-absent"),
+    pytest.param(en_json({"text": 42}), 422, id="mauvais-type"),
+    pytest.param(b"pas du json", 422, id="json-invalide"),
 ]
+
+
+def verifier_erreur_standard(reponse):
+    assert reponse.status_code == 422
+
+    detail = reponse.json()["detail"]
+
+    assert isinstance(detail, list)
+    assert len(detail) > 0
+
+    for erreur in detail:
+        assert "loc" in erreur
+        assert "msg" in erreur
+        assert "type" in erreur
 
 
 @pytest.mark.parametrize("corps, code_attendu", CAS)
 def test_frontieres_du_contrat(client, corps, code_attendu):
-    reponse = client.post("/predict", content=corps, headers={"Content-Type": "application/json"})
+    reponse = client.post(
+        "/predict",
+        content=corps,
+        headers={"Content-Type": "application/json"},
+    )
+
     assert reponse.status_code == code_attendu
-    # Étape B.2 : pour chaque 422, vérifiez aussi la FORME de la réponse :
-    # « detail » doit être la liste d'erreurs standard de FastAPI (objets avec loc, msg, type).
+
+    if code_attendu == 422:
+        verifier_erreur_standard(reponse)
+    else:
+        assert reponse.json()["label"] in {
+            "POSITIVE", "NEGATIVE", "INDETERMINE"
+        }
+        assert 0 <= reponse.json()["score"] <= 1
 
 
-# Étape B.5 : deux tests de propriété avec hypothesis, dans ce fichier.
-#   from hypothesis import given, settings, strategies as st
-#   1. tout texte de 1 à 2000 caractères contenant un caractère non blanc :
-#      200, étiquette du contrat, score entre 0 et 1 ;
-#   2. tout texte fait uniquement de blancs : 422, sous la forme standard.
-# Pensez à @settings(deadline=None) : le premier appel peut être plus lent que les autres.
+# B.5 : tests de propriétés avec Hypothesis
+
+@settings(max_examples=20, deadline=None)
+@given(
+    texte=st.text(min_size=1, max_size=2000).filter(
+        lambda valeur: bool(valeur.strip())
+    )
+)
+def test_tout_texte_non_blanc_est_accepte(client, texte):
+    reponse = client.post("/predict", json={"text": texte})
+
+    assert reponse.status_code == 200
+
+    resultat = reponse.json()
+
+    assert resultat["label"] in {
+        "POSITIVE", "NEGATIVE", "INDETERMINE"
+    }
+    assert 0 <= resultat["score"] <= 1
+
+
+@settings(max_examples=20, deadline=None)
+@given(
+    texte=st.text(
+        alphabet=[" ", "\t", "\n", "\r"],
+        min_size=1,
+        max_size=2000,
+    )
+)
+def test_tout_texte_blanc_est_refuse(client, texte):
+    reponse = client.post("/predict", json={"text": texte})
+
+    verifier_erreur_standard(reponse)

@@ -1,5 +1,6 @@
 ﻿"""Interface Streamlit du TP5 : communication exclusivement via l'API."""
 import streamlit as st
+
 from ui import client
 
 st.set_page_config(

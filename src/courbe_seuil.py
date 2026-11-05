@@ -32,6 +32,17 @@ def main() -> int:
     if not MODELE.exists():
         raise SystemExit("Modèle absent : lancez d'abord python src/train.py")
     df, source = charger(args.allocine)
+    # Reproduire exactement le nettoyage de train.py
+    df = df[
+    df["label"].isin(["positive", "negative"])
+    ].copy()
+
+    df["review"] = df["review"].astype(str).str.strip()
+    df = df[df["review"] != ""]
+
+    df = df.drop_duplicates(
+    subset=["review", "label"]
+    ).reset_index(drop=True)
     if METRIQUES.exists():
         entraine_sur = str(json.loads(METRIQUES.read_text(encoding="utf-8")).get("source", "?"))
         if entraine_sur.lower()[:4] != str(source).lower()[:4]:
