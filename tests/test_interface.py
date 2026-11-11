@@ -15,7 +15,7 @@ pytestmark = pytest.mark.skipif(not (RACINE / "models" / "sentiment.joblib").exi
                                 reason="modèle non produit : python src/train.py")
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def api():
     from fastapi.testclient import TestClient
 

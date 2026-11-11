@@ -1,7 +1,6 @@
 ﻿"""Tests des sous-commandes de sentiment (TP6)."""
 
 import json
-import subprocess
 import sys
 from pathlib import Path
 

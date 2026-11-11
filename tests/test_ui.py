@@ -14,7 +14,7 @@ MODELE = RACINE / "models" / "sentiment.joblib"
 sys.path.insert(0, str(RACINE / "ui"))
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def predire():
     if not MODELE.exists():
         pytest.skip("models/sentiment.joblib absent sur ce poste (normal en CI)")

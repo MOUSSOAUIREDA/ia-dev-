@@ -24,7 +24,7 @@ def lire_metriques() -> dict:
     return json.loads(METRIQUES.read_text(encoding="utf-8"))
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def predicteur():
     if not MODELE.exists():
         pytest.skip("models/sentiment.joblib absent sur ce poste (normal en CI)")

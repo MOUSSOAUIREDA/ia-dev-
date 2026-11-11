@@ -10,7 +10,7 @@ MODELE = Path(__file__).resolve().parents[1] / "models" / "sentiment.joblib"
 pytestmark = pytest.mark.skipif(not MODELE.exists(), reason="modèle non produit : python src/train.py")
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def session():
     from fastapi.testclient import TestClient
 

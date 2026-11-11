@@ -45,7 +45,7 @@ def test_jeu_or_complet():
         assert ligne["attendu"] in FRANCHES, f"étiquette attendue invalide : {ligne['attendu']!r}"
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def client():
     if not MODELE.exists():
         pytest.skip("modèle non produit : python src/train.py")

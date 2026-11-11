@@ -16,7 +16,7 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def client():
     from fastapi.testclient import TestClient
 
@@ -57,6 +57,7 @@ def verifier_erreur_standard(reponse):
         assert "type" in erreur
 
 
+# B.1 : tests des frontières du contrat
 @pytest.mark.parametrize("corps, code_attendu", CAS)
 def test_frontieres_du_contrat(client, corps, code_attendu):
     reponse = client.post(
@@ -71,7 +72,9 @@ def test_frontieres_du_contrat(client, corps, code_attendu):
         verifier_erreur_standard(reponse)
     else:
         assert reponse.json()["label"] in {
-            "POSITIVE", "NEGATIVE", "INDETERMINE"
+            "POSITIVE",
+            "NEGATIVE",
+            "INDETERMINE",
         }
         assert 0 <= reponse.json()["score"] <= 1
 
@@ -84,15 +87,22 @@ def test_frontieres_du_contrat(client, corps, code_attendu):
         lambda valeur: bool(valeur.strip())
     )
 )
-def test_tout_texte_non_blanc_est_accepte(client, texte):
-    reponse = client.post("/predict", json={"text": texte})
+def test_tout_texte_non_blanc_est_accepte(texte):
+    from fastapi.testclient import TestClient
+
+    from api.main import app
+
+    with TestClient(app) as client:
+        reponse = client.post("/predict", json={"text": texte})
 
     assert reponse.status_code == 200
 
     resultat = reponse.json()
 
     assert resultat["label"] in {
-        "POSITIVE", "NEGATIVE", "INDETERMINE"
+        "POSITIVE",
+        "NEGATIVE",
+        "INDETERMINE",
     }
     assert 0 <= resultat["score"] <= 1
 
@@ -105,7 +115,12 @@ def test_tout_texte_non_blanc_est_accepte(client, texte):
         max_size=2000,
     )
 )
-def test_tout_texte_blanc_est_refuse(client, texte):
-    reponse = client.post("/predict", json={"text": texte})
+def test_tout_texte_blanc_est_refuse(texte):
+    from fastapi.testclient import TestClient
+
+    from api.main import app
+
+    with TestClient(app) as client:
+        reponse = client.post("/predict", json={"text": texte})
 
     verifier_erreur_standard(reponse)

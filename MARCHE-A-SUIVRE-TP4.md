@@ -184,7 +184,7 @@ git push
 | --- | --- | --- |
 | `ERREUR : api/main.py absent` | Le TP3 (l'API) n'est pas dans le dépôt | Appliquer d'abord le kit du TP3 |
 | `No module named 'hypothesis'` ou `ruff` introuvable | Outils de la semaine non installés | `pip install -r requirements-dev.txt`, environnement activé |
-| `FailedHealthCheck` et `function_scoped_fixture` | Fixture de portée `function` dans un test hypothesis | `@pytest.fixture(scope="module")` |
+| `FailedHealthCheck` et `function_scoped_fixture` | Fixture de portée `function` dans un test hypothesis | `@pytest.fixture` |
 | `DeadlineExceeded` | Un exemple dépasse le délai par défaut d'hypothesis | `@settings(deadline=None)` |
 | mypy : `Cannot find implementation or library stub for module named "predict"` | mypy lancé ailleurs qu'à la racine, ou section `[tool.mypy]` absente | Lancer depuis la racine ; vérifier `pyproject.toml` |
 | pre-commit : exécutable `ruff` ou `mypy` introuvable | Commit lancé sans l'environnement virtuel | Activer l'environnement, puis recommiter |

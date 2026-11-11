@@ -15,7 +15,7 @@ def _git(root: Path, *args: str) -> str:
     return subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, check=True).stdout
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def git_root(root: Path) -> Path:
     if shutil.which("git") is None or not (root / ".git").exists():
         pytest.skip("pas un dépôt Git")
