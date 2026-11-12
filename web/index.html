@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Application d'analyse de sentiment des avis clients.">
+    <title>Sentiment AI | Analyse des avis</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <a class="brand" href="#">
+            <span class="brand-icon">S</span>
+            <span>Sentiment<span class="brand-accent">AI</span></span>
+        </a>
+
+        <div class="api-status">
+            <span id="status-indicator" class="status-dot"></span>
+            <span id="status-text">Vérification de l'API...</span>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <span class="eyebrow">INTELLIGENCE ARTIFICIELLE</span>
+            <h1>Comprenez le sentiment<br>de vos <span>clients.</span></h1>
+            <p>
+                Analysez automatiquement les avis clients grâce
+                à notre modèle de machine learning.
+            </p>
+        </section>
+
+        <section class="analyzer-card">
+            <div class="card-heading">
+                <div>
+                    <h2>Analyse d'un avis</h2>
+                    <p>Entrez un texte en français pour commencer.</p>
+                </div>
+                <span class="ai-badge">AI POWERED</span>
+            </div>
+
+            <form id="sentiment-form">
+                <label for="review-input">Votre avis client</label>
+
+                <textarea
+                    id="review-input"
+                    maxlength="2000"
+                    placeholder="Exemple : La livraison était rapide et le produit correspond parfaitement à mes attentes..."
+                    required
+                ></textarea>
+
+                <div class="input-footer">
+                    <span id="char-count">0 / 2000</span>
+                    <span>Français</span>
+                </div>
+
+                <button type="submit" id="analyze-button">
+                    <span id="button-text">Analyser le sentiment</span>
+                    <span aria-hidden="true">→</span>
+                </button>
+            </form>
+
+            <div id="error-message" class="message error hidden"></div>
+
+            <section id="result-section" class="result hidden" aria-live="polite">
+                <div class="result-top">
+                    <div>
+                        <span class="result-label">RÉSULTAT DE L'ANALYSE</span>
+                        <h3 id="result-label">POSITIVE</h3>
+                    </div>
+                    <span id="result-icon" class="result-icon">✓</span>
+                </div>
+
+                <div class="confidence">
+                    <div class="confidence-header">
+                        <span>Score de confiance</span>
+                        <strong id="confidence-value">95 %</strong>
+                    </div>
+                    <div class="progress-track">
+                        <div id="confidence-bar" class="progress-bar"></div>
+                    </div>
+                </div>
+
+                <p id="result-description" class="result-description"></p>
+            </section>
+        </section>
+
+        <footer>
+            <p>Sentiment AI · Projet Machine Learning · 2026</p>
+            <a href="http://localhost:8000/docs" target="_blank">
+                Documentation API ↗
+            </a>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
